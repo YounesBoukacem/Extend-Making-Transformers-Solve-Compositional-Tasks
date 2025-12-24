@@ -1,0 +1,5 @@
+data_id, description, tags
+d1-focal-fossa,data for addition task. 1000 examples. 800 train. 100 val.,addition
+d2-majin-tech,data for string concatenation task. 1M examples. 98%train. 1% val.,concatenation
+d3-new-vestroia,data for simple string interleaving task. all strings have same length. 1M examples. 98% train. 1% val.,simple_interleaving
+d4-flem-libra,data for string reversal. 1M examples. 98% train. 1% val.,reversal

@@ -1,0 +1,2 @@
+experiment_id, description, tags, data_used
+e1-helios-jumper,gpt model. 6 Transformer layers. 8 attention heads. 128 embedding dimension.,,d1-focal-fossa
