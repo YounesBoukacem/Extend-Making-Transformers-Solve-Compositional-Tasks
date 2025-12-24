@@ -102,8 +102,8 @@ np.random.seed(seed)
 
 # Set arch-hyperparams for the GPT model
 block_size 	= 128 	# Maximum context length
-n_embd 		= 128	# Embedding dimension
-n_head 		= 8	# Number of attention heads
+n_embd 		= 256	# Embedding dimension
+n_head 		= 16	# Number of attention heads
 n_layer 	= 6	# Number of transformer blocks
 # Set the data directory
 DDIR = "../../data/d3-new-vestroia/"

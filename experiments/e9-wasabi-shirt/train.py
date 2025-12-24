@@ -101,12 +101,12 @@ np.random.seed(seed)
 #============================================
 
 # Set arch-hyperparams for the GPT model
-block_size 	= 128 	# Maximum context length
-n_embd 		= 128	# Embedding dimension
-n_head 		= 8	# Number of attention heads
-n_layer 	= 6	# Number of transformer blocks
+block_size 	= 256 	# Maximum context length
+n_embd 		= 256	# Embedding dimension
+n_head 		= 16	# Number of attention heads
+n_layer 	= 12	# Number of transformer blocks
 # Set the data directory
-DDIR = "../../data/d3-new-vestroia/"
+DDIR = "../../data/d6-new-gundalia/"
 with open(DDIR+"vocab_size.txt", "rb") as f:
 	vocab_size = int(f.read())
 # Set the vocab size manually to 128 to round up to the nearest power of two for optimized training
@@ -139,7 +139,7 @@ if master_process: log(f"took {convert_seconds(after - before)}")
 #============================================
 
 # Set the train-hyperparams
-batch_size = 256   	# Batch size for training
+batch_size = 512   	# Batch size for training
 batch_nb_tokens = batch_size * block_size
 assert batch_size % len(deviceids) == 0 # for now just to make sure
 microbatch_size = batch_size // len(deviceids) # micro batch size == batch size per device

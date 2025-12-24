@@ -1,2 +1,12 @@
 experiment_id, description, tags, data_used
-e1-helios-jumper,gpt model. 6 Transformer layers. 8 attention heads. 128 embedding dimension.,,d1-focal-fossa
+e1-helios-jumper,gpt model. 6 Transformer layers. 8 attention heads. 128 embedding dimension. addition task.,addition_task.,d1-focal-fossa
+e2-pyrus-mechtogan,gpt model. 6 Transformer layers. 8 attention heads. 128 embedding dimension. concatenation task.,concatenation_task.,d2-majin-tech
+e3-storm-pegasus,gpt model. 6 Transformer layers. 8 attention heads. 128 embedding dimension. interleaving task.,interleaving_task.,d3-new-vestroia
+e4-ingram-ventus,gpt model. 6 Transformer layers. 8 attention heads. 128 embedding dimension. reversal task.,reversal_task.,d4-flem-libra
+e5-mega-equinox,gpt model. 6 Transformer layers. 8 attention heads. 128 embedding dimension. duplication task.,duplication_task.,d5-preas-aquos
+e6-honey-lemon,gpt model. 12 Transformer layers. 8 attention heads. 128 embedding dimension. 128 context window. simple_interleaving task.,simple_interleaving_task,d3-new-vestroia
+e7-gogo-tomago,gpt model. 6 Transformer layers. 8 attention heads. 128 embedding dimension. 256 context window. simple_interleaving task.,simple_interleaving_task,d3-new-vestroia
+e8-hero-hamada,gpt model. 6 Transformer layers. 16 attention heads. 256 embedding dimension.  128 context window. simple_interleaving task.,simple_interleaving_task,d3-new-vestroia
+e9-wasabi-shirt,gpt model. 12 Transformer layers. 16 attention heads. 256 embedding dimension. 256 context window. simple_interleaving task.,simple_interleaving_task,d3-new-vestroia
+,,,
+,,,

@@ -104,7 +104,7 @@ np.random.seed(seed)
 block_size 	= 128 	# Maximum context length
 n_embd 		= 128	# Embedding dimension
 n_head 		= 8	# Number of attention heads
-n_layer 	= 6	# Number of transformer blocks
+n_layer 	= 12	# Number of transformer blocks
 # Set the data directory
 DDIR = "../../data/d3-new-vestroia/"
 with open(DDIR+"vocab_size.txt", "rb") as f:
