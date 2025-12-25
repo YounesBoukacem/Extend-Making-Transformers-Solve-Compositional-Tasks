@@ -7,6 +7,14 @@ e5-mega-equinox,gpt model. 6 Transformer layers. 8 attention heads. 128 embeddin
 e6-honey-lemon,gpt model. 12 Transformer layers. 8 attention heads. 128 embedding dimension. 128 context window. simple_interleaving task.,simple_interleaving_task,d3-new-vestroia
 e7-gogo-tomago,gpt model. 6 Transformer layers. 8 attention heads. 128 embedding dimension. 256 context window. simple_interleaving task.,simple_interleaving_task,d3-new-vestroia
 e8-hero-hamada,gpt model. 6 Transformer layers. 16 attention heads. 256 embedding dimension.  128 context window. simple_interleaving task.,simple_interleaving_task,d3-new-vestroia
-e9-wasabi-shirt,gpt model. 12 Transformer layers. 16 attention heads. 256 embedding dimension. 256 context window. simple_interleaving task.,simple_interleaving_task,d3-new-vestroia
-,,,
-,,,
+e9-wasabi-shirt,gpt model. 12 Transformer layers. 16 attention heads. 256 embedding dimension. 128 context window. simple_interleaving task.,simple_interleaving_task,d6-new-gundalia
+e10-pimento-shirt,gpt model. 12 Transformer layers. 16 attention heads. 256 embedding dimension. 128 context window. simple_interleaving task. 4 epochs.,simple_interleaving_task,d6-new-gundalia
+e11-puree-shirt,gpt model. 12 Transformer layers. 16 attention heads. 256 embedding dimension. 128 context window. 2 additional epochs on e10-pimento-shirt. simple_interleaving task.,simple_interleaving_task,d6-new-gundalia
+e12-mega-shirt,gpt model. 12 Transformer layers. 16 attention heads. 256 embedding dimension. 128 context window. 6 epochs. 1 LWCD lr schedule. simple_interleaving task.,simple_interleaving_task,d6-new-gundalia
+e13-sinus-trend,"gpt model. 12 Transformer layers. 16 attention heads. 256 embedding dimension. 6 epochs. [1,1,1] LWCD lr schedule. 128 context window. simple_interleaving task.",simple_interleaving_task,d6-new-gundalia
+e14-sinus-control,"gpt model. 12 Transformer layers. 16 attention heads. 256 embedding dimension. 6 epochs. [4, 2,] LWCD lr schedule. 128 context window. simple_interleaving task.",simple_interleaving_task,d6-new-gundalia
+e15-mega-control,"gpt model. 12 Transformer layers. 16 attention heads. 256 embedding dimension. 6 epochs. [4, 2] LWCD lr schedule. seed reset at every lr period. 128 context window. simple_interleaving task.",simple_interleaving_task,d6-new-gundalia
+e16-push-mechtogan,"gpt model. 12 Transformer layers. 16 attention heads. 256 embedding dimension. 6 epochs. [4, 2,] LWCD lr schedule. 128 context window. concatenation task.",concatenation_task,d7-push-majin
+e17-push-pegasus,"gpt model. 12 Transformer layers. 16 attention heads. 256 embedding dimension. 6 epochs. [4, 2,] LWCD lr schedule. 128 context window. simple_interleaving task.",simple_interleaving_task,d8-push-vestroia
+e18-push-ventus,"gpt model. 12 Transformer layers. 16 attention heads. 256 embedding dimension. 6 epochs. [4, 2,] LWCD lr schedule. 128 context window. reversal task.",reversal_task,d9-push-libra
+e19-push-equinox,"gpt model. 12 Transformer layers. 16 attention heads. 256 embedding dimension. 6 epochs. [4, 2,] LWCD lr schedule. 128 context window. duplication task.",duplication_task,d10-push-aquos

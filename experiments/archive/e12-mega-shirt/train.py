@@ -16,7 +16,7 @@ from 	torch.nn.parallel 	import DistributedDataParallel as DDP
 #============================================
 
 # Set the device ids
-deviceids 	= [0]
+deviceids 	= [0, 1, 2, 3]
 
 # Check if this is a ddp run
 ddp = int(os.environ.get('RANK', -1)) != -1
@@ -101,7 +101,7 @@ np.random.seed(seed)
 #============================================
 
 # Set arch-hyperparams for the GPT model
-block_size 	= 256 	# Maximum context length
+block_size 	= 128 	# Maximum context length
 n_embd 		= 256	# Embedding dimension
 n_head 		= 16	# Number of attention heads
 n_layer 	= 12	# Number of transformer blocks
@@ -148,7 +148,7 @@ acum_steps = 1
 assert microbatch_size % acum_steps == 0
 nano_batch_size = microbatch_size // acum_steps
 dropout = 0 # Dropout rate
-max_pseudo_epochs = 2	# Number of pseudo-epochs to train for
+max_pseudo_epochs = 6	# Number of pseudo-epochs to train for
 max_iters = int( ( max_pseudo_epochs * len(train_data) ) / ( batch_size * block_size ) )
 epoch_iters = int(len(train_data) / (batch_size * block_size))
 learning_rate = 1e-3 # Initial Learning rate value
@@ -175,7 +175,7 @@ compile_mode = 'default'
 
 # Set the evaluation-hyperparams
 eval_batch_size = 128
-eval_interval = int(epoch_iters * 0.1) # Evaluation interval
+eval_interval = int(epoch_iters * 0.5) # Evaluation interval
 eval_iters = 100  # Number of iterations for evaluation
 
 

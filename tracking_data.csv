@@ -3,3 +3,10 @@ d1-focal-fossa,data for addition task. 1000 examples. 800 train. 100 val.,additi
 d2-majin-tech,data for string concatenation task. 1M examples. 98%train. 1% val.,concatenation
 d3-new-vestroia,data for simple string interleaving task. all strings have same length. 1M examples. 98% train. 1% val.,simple_interleaving
 d4-flem-libra,data for string reversal. 1M examples. 98% train. 1% val.,reversal
+d5-preas-aquos,data for string duplication. 1M examples. 98% train. 1% val.,duplication
+d6-new-gundalia,data for simple string interleaving. 2M examples. 99% train. 0.5% val.,simple_interleaving.
+d7-push-majin,data for concatenation. 2M examples. 99% train. 0.5% val.,concatenation.
+d8-push-vestroia,data for simple_interleaving. 2M examples. 99% train. 0.5% val.,simple_interleaving.
+d7-push-libra,data for reversal. 2M examples. 99% train. 0.5% val.,reversal.
+d7-push-aquos,data for duplication. 2M examples. 99% train. 0.5% val.,duplication.
+,,
