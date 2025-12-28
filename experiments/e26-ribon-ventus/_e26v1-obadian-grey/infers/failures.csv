@@ -1,0 +1,17 @@
+,example_input,example_output,all-generated-output
+0,"#input
+emokp
+gqoae
+nz
+ajdrz
+a
+#output
+","p k o m e 
+ e a o q g 
+ z n 
+ z r d j a 
+ a","p k o m e 
+ e a o q g 
+ z z n 
+ z r d j a 
+ a@"

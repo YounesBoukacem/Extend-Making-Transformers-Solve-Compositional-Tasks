@@ -1,0 +1,397 @@
+,example_input,example_output,all-generated-output
+0,"#input
+m
+f
+h
+z
+t
+m
+#output
+",m f h z t m,m f h z t m@
+1,"#input
+w
+q
+w
+v
+r
+z
+#output
+",w q w v r z,w q w v r z@
+2,"#input
+o
+g
+t
+l
+h
+u
+#output
+",o g t l h u,o g t l h u@
+3,"#input
+j
+p
+e
+y
+w
+y
+#output
+",j p e y w y,j p e y w y@
+4,"#input
+u
+o
+r
+s
+f
+b
+#output
+",u o r s f b,u o r s f b@
+5,"#input
+y
+e
+p
+s
+b
+m
+#output
+",y e p s b m,y e p s b m@
+6,"#input
+k
+o
+l
+u
+t
+m
+#output
+",k o l u t m,k o l u t m@
+7,"#input
+p
+u
+w
+n
+b
+u
+#output
+",p u w n b u,p u w n b u@
+8,"#input
+l
+g
+g
+j
+v
+m
+#output
+",l g g j v m,l g g j v m@
+9,"#input
+k
+c
+d
+q
+n
+w
+#output
+",k c d q n w,k c d q n w@
+10,"#input
+w
+g
+q
+w
+i
+e
+#output
+",w g q w i e,w g q w i e@
+11,"#input
+l
+c
+w
+a
+i
+g
+#output
+",l c w a i g,l c w a i g@
+12,"#input
+x
+p
+u
+n
+e
+h
+#output
+",x p u n e h,x p u n e h@
+13,"#input
+c
+r
+y
+u
+w
+u
+#output
+",c r y u w u,c r y u w u@
+14,"#input
+w
+x
+q
+b
+n
+u
+#output
+",w x q b n u,w x q b n u@
+15,"#input
+d
+f
+t
+k
+q
+k
+#output
+",d f t k q k,d f t k q k@
+16,"#input
+y
+z
+c
+u
+j
+e
+#output
+",y z c u j e,y z c u j e@
+17,"#input
+c
+u
+a
+q
+g
+x
+#output
+",c u a q g x,c u a q g x@
+18,"#input
+j
+r
+w
+u
+c
+n
+#output
+",j r w u c n,j r w u c n@
+19,"#input
+u
+s
+y
+r
+i
+h
+#output
+",u s y r i h,u s y r i h@
+20,"#input
+b
+l
+x
+s
+r
+p
+#output
+",b l x s r p,b l x s r p@
+21,"#input
+f
+q
+o
+f
+h
+f
+#output
+",f q o f h f,f q o f h f@
+22,"#input
+x
+a
+e
+s
+i
+z
+#output
+",x a e s i z,x a e s i z@
+23,"#input
+o
+o
+i
+c
+p
+u
+#output
+",o o i c p u,o o i c p u@
+24,"#input
+n
+o
+h
+q
+b
+h
+#output
+",n o h q b h,n o h q b h@
+25,"#input
+w
+c
+p
+u
+g
+h
+#output
+",w c p u g h,w c p u g h@
+26,"#input
+j
+s
+z
+a
+r
+f
+#output
+",j s z a r f,j s z a r f@
+27,"#input
+t
+r
+a
+v
+r
+n
+#output
+",t r a v r n,t r a v r n@
+28,"#input
+m
+z
+f
+l
+o
+m
+#output
+",m z f l o m,m z f l o m@
+29,"#input
+m
+n
+h
+u
+p
+m
+#output
+",m n h u p m,m n h u p m@
+30,"#input
+k
+d
+a
+s
+y
+y
+#output
+",k d a s y y,k d a s y y@
+31,"#input
+l
+z
+k
+h
+f
+u
+#output
+",l z k h f u,l z k h f u@
+32,"#input
+o
+e
+z
+x
+p
+u
+#output
+",o e z x p u,o e z x p u@
+33,"#input
+b
+h
+p
+r
+w
+r
+#output
+",b h p r w r,b h p r w r@
+34,"#input
+w
+u
+o
+v
+f
+y
+#output
+",w u o v f y,w u o v f y@
+35,"#input
+e
+m
+n
+b
+f
+x
+#output
+",e m n b f x,e m n b f x@
+36,"#input
+c
+x
+b
+d
+r
+u
+#output
+",c x b d r u,c x b d r u@
+37,"#input
+l
+y
+d
+e
+m
+e
+#output
+",l y d e m e,l y d e m e@
+38,"#input
+x
+p
+s
+v
+b
+u
+#output
+",x p s v b u,x p s v b u@
+39,"#input
+l
+y
+p
+b
+i
+u
+#output
+",l y p b i u,l y p b i u@
+40,"#input
+w
+g
+z
+f
+e
+z
+#output
+",w g z f e z,w g z f e z@
+41,"#input
+d
+e
+p
+b
+s
+p
+#output
+",d e p b s p,d e p b s p@
+42,"#input
+w
+q
+m
+l
+t
+y
+#output
+",w q m l t y,w q m l t y@
+43,"#input
+t
+c
+k
+s
+u
+k
+#output
+",t c k s u k,t c k s u k@

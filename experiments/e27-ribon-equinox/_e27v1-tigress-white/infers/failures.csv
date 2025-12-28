@@ -1,0 +1,18 @@
+,example_input,example_output,all-generated-output
+0,"#input
+p
+p
+h
+b
+x
+#output
+","p 
+ p 
+ h 
+ b 
+ x","p 
+ p 
+ h 
+ b 
+ x 
+ x@"
