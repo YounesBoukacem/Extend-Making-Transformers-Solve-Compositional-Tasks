@@ -1,0 +1,7 @@
+,example_input,example_output,all-generated-output
+0,"#input
+czuoo
+csccn
+bzscm
+#output
+",c c b z s z u c s o c c o n m,c c b z z s z c s o c c o n m@

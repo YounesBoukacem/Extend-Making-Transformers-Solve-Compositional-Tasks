@@ -1,0 +1,21 @@
+,example_input,example_output,all-generated-output
+0,"#input
+lzphs
+ykdha
+sztzg
+yutct
+#output
+",l y s y z k z u p d t t h h z c s a g t,l y s y z k z u p d t t h z h c s a g t@
+1,"#input
+abht
+fcho
+czlh
+hkpc
+#output
+",a f c h b c z k h h l p t o h c,a f c h b c z k h l p p t o h c@
+2,"#input
+egg
+pqg
+qzu
+#output
+",e p q g q z g g u,e p q g q z g u@

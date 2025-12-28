@@ -1,0 +1,31 @@
+,example_input,example_output,all-generated-output
+0,"#input
+yhrw
+ohli
+atet
+cica
+#output
+",y o a c h h t i r l e c w i t a,y o a c h t i t r l e c w i t a@
+1,"#input
+knno
+onzu
+xvsq
+lxol
+#output
+",k o x l n n v x n z s o o u q l,k o x l n v n x n z s o o u q l@
+2,"#input
+tjl
+zxw
+xln
+#output
+",t z x j x l l w n,t z x j x l w n@
+3,"#input
+lqwr
+qybg
+#output
+",l q q y w b r g,l q y q w b r g@
+4,"#input
+cnen
+npjx
+#output
+",c n n p e j n x,c n p e j n x@

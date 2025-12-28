@@ -1,0 +1,115 @@
+,example_input,example_output,all-generated-output
+0,"#input
+j
+iasdwskf
+cjmm
+k
+oupmf
+a
+#output
+","j 
+ i a s d w s k f 
+ c j m m 
+ k 
+ o u p m f 
+ a","j 
+ i a s d w s k f 
+ c j m m 
+ k 
+ o u p m f 
+ a@"
+1,"#input
+po
+k
+i
+mpsg
+kuxevvyrv
+th
+#output
+","p o 
+ k 
+ i 
+ m p s g 
+ k u x e v v y r v 
+ t h","p o 
+ k 
+ i 
+ m p s g 
+ k u x e v v y r v 
+ t h@"
+2,"#input
+u
+id
+zluupezs
+w
+m
+ygqpr
+#output
+","u 
+ i d 
+ z l u u p e z s 
+ w 
+ m 
+ y g q p r","u 
+ i d 
+ z l u u p e z s 
+ w 
+ m 
+ y g q p r@"
+3,"#input
+ct
+xa
+wbbh
+guaqste
+q
+ys
+#output
+","c t 
+ x a 
+ w b b h 
+ g u a q s t e 
+ q 
+ y s","c t 
+ x a 
+ w b b h 
+ g u a q s t e 
+ q 
+ y s@"
+4,"#input
+s
+tknh
+f
+m
+wmkjlx
+exds
+#output
+","s 
+ t k n h 
+ f 
+ m 
+ w m k j l x 
+ e x d s","s 
+ t k n h 
+ f 
+ m 
+ w m k j l x 
+ e x d s@"
+5,"#input
+v
+rbh
+o
+q
+chi
+amapnovl
+#output
+","v 
+ r b h 
+ o 
+ q 
+ c h i 
+ a m a p n o v l","v 
+ r b h 
+ o 
+ q 
+ c h i 
+ a m a p n o v l@"

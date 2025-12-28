@@ -1,0 +1,43 @@
+,example_input,example_output,all-generated-output
+0,"#input
+eyn
+hqdpt
+louho
+fmgwa
+#output
+","e y n 
+ h q d p t 
+ l o u h o 
+ f m g w a","e y n 
+ h q d p t 
+ l o u h o 
+ f m g w@"
+1,"#input
+ojlx
+sw
+olc
+vvx
+eewo
+#output
+","o j l x 
+ s w 
+ o l c 
+ v v x 
+ e e w o","o j l x 
+ s w 
+ o l c 
+ v v x 
+ e e w@"
+2,"#input
+km
+bfll
+szrch
+mgwzk
+#output
+","k m 
+ b f l l 
+ s z r c h 
+ m g w z k","k m 
+ b f l l 
+ s z r c h 
+ m g w@"
