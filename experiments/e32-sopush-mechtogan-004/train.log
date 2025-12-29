@@ -1,0 +1,72 @@
+|BATCH_LOSS: 0.00000 | TPS:   427211 tokens/sec. | ITERS: 3866 / 3866 | EPOCHS: 2.00 | COMP: 100.00% | LR: 0.0001 it./s | SPD: 153.4040 ms/it.| ERT: (0, 0, 0, 0) | ET: (0, 0, 15, 42)                  
+val>|ITERS: 100 / 100 | COMP: 100.00% | RATE: 14.98 it./s | SPD: 0.0667 s/it.| ERT: (0, 0, 0, 0) | ET: (0, 0, 0, 15)                                                                                    
+
+vocab_size: 30
+
+Compiling the model... (takes a ~minute)
+
+Evaluating initial loss
+
+INITIAL LOSS: train loss 1.3197050066082738e-06 | val loss 6.239861249923706e-08
+
+INIT ITER TIME: 132.10910606384277
+
+INIT ITER TIME: 0.20480871200561523
+
+INIT ITER TIME: 0.1544501781463623
+
+INIT ITER TIME: 0.188981294631958
+
+INIT ITER TIME: 0.18649744987487793
+
+INIT ITER TIME: 0.1672830581665039
+
+INIT ITER TIME: 0.1583709716796875
+
+INIT ITER TIME: 0.16441655158996582
+
+INIT ITER TIME: 0.15392303466796875
+
+INIT ITER TIME: 0.16376042366027832
+
+INIT ITER TIME: 0.1537938117980957
+
+
+Evaluation and checkpointing ...
+
+
+
+checkpoint_2025-12-30_03-00 : iter        966 | epoch 0.50 | train loss 0.0000862717 | val loss 0.0000024140
+
+
+
+Evaluation and checkpointing ...
+
+
+
+checkpoint_2025-12-30_03-04 : iter       1932 | epoch 1.00 | train loss 0.0000753394 | val loss 0.0003681183
+
+
+
+Evaluation and checkpointing ...
+
+
+
+checkpoint_2025-12-30_03-07 : iter       2898 | epoch 1.50 | train loss 0.0000429917 | val loss 0.0000017211
+
+
+
+Evaluation and checkpointing ...
+
+
+
+checkpoint_2025-12-30_03-10 : iter       3864 | epoch 2.00 | train loss 0.0000000131 | val loss 0.0000000101
+
+
+
+Evaluation and checkpointing ...
+
+
+
+checkpoint_2025-12-30_03-10 : iter       3866 | epoch 2.00 | train loss 0.0000000109 | val loss 0.0000000102
+

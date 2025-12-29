@@ -1,0 +1,90 @@
+,example_input,example_output,all-generated-output
+0,"#input
+waxb
+vdqad
+kxls
+ppekihjopf
+mpphw
+#output
+",w a x b v d q a d k x l s p p e k i h j o p f m p p h w,w a x b v d q a d k x l s p p e k i h j o p f m p h w w@
+1,"#input
+berwi
+grnqelejfy
+abxlh
+yhizg
+oue
+#output
+",b e r w i g r n q e l e j f y a b x l h y h i z g o u e,b e r w i g r n q e l e j f y a b x l h y h i z g u e@
+2,"#input
+wtqn
+yytpgclmwg
+hjniu
+pzwe
+bzqq
+#output
+",w t q n y y t p g c l m w g h j n i u p z w e b z q q,w t q n y y t p g c l m w g h j n i u p z w e b z q q q@
+3,"#input
+fhauzvgero
+tpwgq
+ibmo
+rbgbf
+jct
+#output
+",f h a u z v g e r o t p w g q i b m o r b g b f j c t,f h a u z v g e r o t p w g q i b m o r b g b f c t@
+4,"#input
+dujyd
+ceqay
+gpcrn
+bk
+tgsvuvnqug
+#output
+",d u j y d c e q a y g p c r n b k t g s v u v n q u g,d u j y d c e q a y g p c r n b k t g s v u v n u g@
+5,"#input
+iosye
+kbkquloqzg
+dtjl
+jrppx
+#output
+",i o s y e k b k q u l o q z g d t j l j r p p x,i o s y e k b k q u l o q z g d t j l j r p x@
+6,"#input
+pjjq
+xjezw
+wwmypolebx
+jywwr
+#output
+",p j j q x j e z w w w m y p o l e b x j y w w r,p j j q x j e z w w w m y p o l e b x j y w r@
+7,"#input
+lplwzhxrqw
+twbcq
+odksb
+nnm
+#output
+",l p l w z h x r q w t w b c q o d k s b n n m,l p l w z h x r q w t w b c q o d k s b n m@
+8,"#input
+kkrw
+evmdiwjscf
+vgeif
+oeee
+#output
+",k k r w e v m d i w j s c f v g e i f o e e e,k k r w e v m d i w j s c f v g e i f o e e@
+9,"#input
+auqstjrvx
+udxdx
+tytku
+kkt
+#output
+",a u q s t j r v x u d x d x t y t k u k k t,a u q s t j r v x u d x d x t y t k u k t@
+10,"#input
+eag
+swz
+jckgo
+afmlnwrrru
+#output
+",e a g s w z j c k g o a f m l n w r r r u,e a g s w z j c k g o a f m l n w r r u@
+11,"#input
+evhh
+lopkbxriwn
+eunan
+np
+#output
+",e v h h l o p k b x r i w n e u n a n n p,e v h h l o p k b x r i w n e u n a n p@

@@ -1,0 +1,38 @@
+,example_input,example_output,all-generated-output
+0,"#input
+kog
+zoojh
+ktykx
+kisb
+klhhv
+#output
+",k o g z o o j h k t y k x k i s b k l h h v,k o g z o o j h k t y k x k i s b k l h v@
+1,"#input
+kvkd
+anup
+neurf
+uwjo
+atrry
+#output
+",k v k d a n u p n e u r f u w j o a t r r y,k v k d a n u p n e u r f u w j o a t r y@
+2,"#input
+sepgy
+rnqz
+rhhhm
+vby
+#output
+",s e p g y r n q z r h h h m v b y,s e p g y r n q z r h h m v b y@
+3,"#input
+udlnf
+gc
+rqlzu
+kxlll
+#output
+",u d l n f g c r q l z u k x l l l,u d l n f g c r q l z u k x l l@
+4,"#input
+kqc
+wrl
+ll
+wdqz
+#output
+",k q c w r l l l w d q z,k q c w r l l w d q z@
