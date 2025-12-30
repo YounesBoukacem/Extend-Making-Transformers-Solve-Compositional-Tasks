@@ -322,7 +322,7 @@ class GPT(nn.Module):
 
 # Create the model
 model = GPT()
-model.load_state_dict(torch.load("../e32-sopush-mechtogan-004/checkpoints/checkpoint_2.00.pth", map_location=device))
+model.load_state_dict(torch.load("../e33-sopush-mechtogan-005/checkpoints/checkpoint_2.00.pth", map_location=device))
 # Loading the model from the last checkpoint
 model.to(device)
 num_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
