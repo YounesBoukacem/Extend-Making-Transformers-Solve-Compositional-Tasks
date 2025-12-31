@@ -4,19 +4,20 @@ import 	time
 import 	torch
 import 	datetime
 import 	math
-import  inspect
+import inspect
 import 	torch.nn 			as nn
 import 	torch.nn.functional as F
 import 	numpy 				as np
 import 	torch.distributed 	as dist
 from 	torch.nn.parallel 	import DistributedDataParallel as DDP
+from 	InputMaskingSampler import InputMaskingSampler
 
 #============================================
 ## Setup for multi-GPU training
 #============================================
 
 # Set the device ids
-deviceids 	= [0, 1, 2, 3]
+deviceids = [4, 5] # Set the device ids to use for training
 
 # Check if this is a ddp run
 ddp = int(os.environ.get('RANK', -1)) != -1
@@ -44,6 +45,10 @@ else:
 	ddp_world_size = 1
 	device = f'cuda:{deviceids[ddp_rank]}'
 	torch.cuda.set_device(device)
+
+#============================================
+## Setup for logging
+#============================================
 
 if master_process:
 
@@ -80,7 +85,7 @@ if master_process:
 
 	# Define function to convert seconds to days, hours, minutes, seconds
 	def convert_seconds(seconds:float):
-		# ignoring the sub seconds 
+		# ignoring the sub seconds
 		seconds = int(seconds)
 		days, seconds = divmod(seconds, 86400)
 		hours, seconds = divmod(seconds, 3600)
@@ -89,12 +94,12 @@ if master_process:
 
 	batch_log = open('batch_log.log', 'w')
 
+
 # Set the random seed for reproducibility
-seed = 42 + seed_offset
+seed = 142+seed_offset
 torch.manual_seed(seed)
 random.seed(seed)
 np.random.seed(seed)
-
 
 #============================================
 ## Setup for architectural hyper-parameters
@@ -106,33 +111,11 @@ n_embd 		= 256	# Embedding dimension
 n_head 		= 16	# Number of attention heads
 n_layer 	= 12	# Number of transformer blocks
 # Set the data directory
-DDIR = "../../data/d7-push-majin/"
+BASE_MODEL_PATH = "../archive/a4-ribon-moon/e26-ribon-ventus/checkpoints/best-model.pth"
+DDIR = "../../data/d17-libra-extend/"
 with open(DDIR+"vocab_size.txt", "rb") as f:
 	vocab_size = int(f.read())
-# Set the vocab size manually to 128 to round up to the nearest power of two for optimized training
 if master_process: log(f"vocab_size: {vocab_size}")
-
-
-#============================================
-## Loading train.bin and test.bin
-#============================================
-
-# Load train.bin
-if master_process: log("Loading train.bin")
-before 		= time.time()
-train_data 	= np.memmap(DDIR+"train.bin", dtype = np.uint8, mode="r")
-# train_data 	= np.array(train_data)
-after 		= time.time()
-if master_process: log(f"took {convert_seconds(after - before)}")
-
-# Load val.bin
-if master_process: log("Loading val.bin")
-before 		= time.time()
-val_data 	= np.memmap(DDIR+"val.bin", dtype = np.uint8, mode="r")
-# val_data 	= np.array(val_data)
-after 		= time.time()
-if master_process: log(f"took {convert_seconds(after - before)}")
-
 
 #============================================
 ## Setup for training hyper-parameters
@@ -148,10 +131,11 @@ acum_steps = 1
 assert microbatch_size % acum_steps == 0
 nano_batch_size = microbatch_size // acum_steps
 dropout = 0 # Dropout rate
-max_pseudo_epochs = 6	# Number of pseudo-epochs to train for
-max_iters = int( ( max_pseudo_epochs * len(train_data) ) / ( batch_size * block_size ) )
-epoch_iters = int(len(train_data) / (batch_size * block_size))
-lr_schedule_periods = [4, 2]
+max_pseudo_epochs = 4	# Number of pseudo-epochs to train for
+train_ims = InputMaskingSampler(DDIR+"train.txt", microbatch_size, block_size)
+epoch_iters = train_ims.encoded_examples.shape[0] // batch_size
+max_iters = max_pseudo_epochs * epoch_iters
+lr_schedule_periods = [2, 2]
 period_iters = math.ceil(max_iters / sum(lr_schedule_periods))
 max_iters = period_iters * sum(lr_schedule_periods)  # adjust max_iters to be multiple of lr_schedule_period
 learning_rate = 1e-3 # Initial Learning rate value
@@ -164,70 +148,48 @@ beta1 = 0.9 # Adam beta1
 beta2 = 0.95 # Adam beta2
 weight_decay = 1e-1 # Weight decay
 grad_clip = 1.0 # Gradient clipping value
-max_degradations = -1 	# number of consecutive degradations on val loss before stoping the training
 cuda_sync = False
 compile = True
 compile_mode = 'default'
 
-
-#============================================
-## Setup for validation hyper-parameters
-#============================================
-
 # Set the evaluation-hyperparams
-eval_batch_size = 128
-eval_interval = int(epoch_iters * 0.5) # Evaluation interval
-eval_iters = 100  # Number of iterations for evaluation
-
-
-#============================================
-## Some utils functions for training and validation
-#============================================
-
-# Define function to get batch of token chunks
-def get_batch(split):
-	data = train_data if split == 'train' else val_data
-	# This is no curriculum so we are just going to sample a random index
-	idx = random.randint(0, len(data) - microbatch_nb_tokens - 1)
-	
-	x = torch.from_numpy((data[idx:idx+microbatch_nb_tokens]).astype(np.int64)).view(microbatch_size, block_size)
-	y = torch.from_numpy((data[idx+1:idx+1+microbatch_nb_tokens]).astype(np.int64)).view(microbatch_size, block_size)
-	x, y = x.to(device), y.to(device)
-
-	return x, y
-
-# Define the evaluation batch size
-
-eval_batch_nb_tokens = eval_batch_size * block_size
-
-# Define the evaluation batch loader
-def load_eval_batch(split):
-	data = train_data if split == 'train' else val_data
-	idx = random.randint(0, len(data) - eval_batch_nb_tokens - 1)
-	x = torch.from_numpy((data[idx:idx+eval_batch_nb_tokens]).astype(np.int64)).view(eval_batch_size, block_size)
-	y = torch.from_numpy((data[idx+1:idx+1+eval_batch_nb_tokens]).astype(np.int64)).view(eval_batch_size, block_size)
-	x, y = x.to(device), y.to(device)
-	return x, y
+if master_process:
+	eval_batch_size = 128
+	eval_interval = int(epoch_iters / 2)
+	print("[*]eval_interval = ", eval_interval, "iters")
+	eval_iters = 100  # Number of iterations for evaluation
+	nb_eval_examples = None
+	val_ims = InputMaskingSampler(DDIR+"/val.txt", eval_batch_size, eval_batch_size, block_size)
 
 # Define function to estimate loss on train and val splits
 @torch.no_grad()
 def estimate_loss():
-	out = {}
+	out = {"train":-1, "val": -1}
 	model.eval()
 	eval_start_time = time.time()
-	for split in ['train', 'val']:
+	for ims_name, ims in [("train", train_ims), ("val", val_ims)]:
 		losses = torch.zeros(eval_iters)
 		for k in range(eval_iters):
 			past = time.time()
-			X, Y = load_eval_batch(split)
+			X, Y, EOI_tokens_indices = ims.__next__()
+			X, Y = torch.tensor(data=X, dtype=torch.int64, device=device), torch.tensor(data=Y, dtype=torch.int64, device=device)
 			with torch.autocast(device_type=device, dtype=torch.bfloat16):
-				logits, loss = model(X, Y)
+				logits = model(X)
+			B, T, C = logits.shape
+			unmasked_logits = []
+			unmasked_targets = []
+			for i , EOI_token_index in enumerate(EOI_tokens_indices):
+				unmasked_logits.append(logits[i, EOI_token_index:, :])
+				unmasked_targets.append(Y[i, EOI_token_index:])
+			logits = torch.cat(unmasked_logits, dim=0)
+			targets = torch.cat(unmasked_targets, dim=0)
+			loss = F.cross_entropy(logits, targets)
 			losses[k] = loss.item()
 			present = time.time()
-			log(f"{split}>|ITERS: {k+1} / {eval_iters} | COMP: {(k+1)/eval_iters * 100:.2f}% | RATE: {1/(present-past):.2f} it./s | SPD: {present - past :.4f} s/it.| ERT: {convert_seconds((eval_iters-k-1) * (present-past))} | ET: {convert_seconds(time.time()-eval_start_time)}", p_level = 2)
-		out[split] = losses.mean()
+			log(f"{ims_name}>|ITERS: {k+1} / {eval_iters} | COMP: {(k+1)/eval_iters * 100:.2f}% | RATE: {1/(present-past):.2f} it./s | SPD: {present - past :.4f} s/it.| ERT: {convert_seconds((eval_iters-k-1) * (present-past))} | ET: {convert_seconds(time.time()-eval_start_time)}", p_level = 2)
+		out[ims_name] = losses.mean()
 	model.train()
-	return out
+	return out # For now let's only compute the loss on the validation split
 
 # Define function to make large numbers of parameters human-readable
 def human_readable(num):
@@ -263,10 +225,7 @@ def get_lr(it):
 	coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio)) # coeff ranges 0..1
 	return min_lr + coeff * (learning_rate - min_lr)
 
-
-#============================================
-## Definition of model architecture
-#============================================
+# __Define the model__
 
 pos_embeds_indices = []
 for i in range(block_size):
@@ -359,7 +318,7 @@ class GPT(nn.Module):
 		self.ln_f = nn.LayerNorm(n_embd, bias=False)
 		self.lm_head = nn.Linear(n_embd, vocab_size)
 
-	def forward(self, idx, targets=None):
+	def forward(self, idx):
 		B, T = idx.shape
 
 		# idx and targets are both (B,T) tensor of integers
@@ -368,22 +327,12 @@ class GPT(nn.Module):
 		x = self.ln_f(x) # (B,T,C)
 		logits = self.lm_head(x) # (B,T,vocab_size)
 
-		if targets is None:
-			loss = None
-		else:
-			B, T, C = logits.shape
-			logits = logits.view(B*T, C)
-			targets = targets.view(B*T)
-			loss = F.cross_entropy(logits, targets)
+		return logits
 
-		return logits, loss
-
-#============================================
-## Model and optimizer initialization
-#============================================
 
 # Create the model
 model = GPT()
+model.load_state_dict(torch.load(BASE_MODEL_PATH, map_location=device))
 # Loading the model from the last checkpoint
 model.to(device)
 num_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -405,7 +354,6 @@ if compile:
 
 
 # Initialize the optimizer
-
 param_dict = {pn: p for pn, p in train_model.named_parameters()}
 # filter out those that do not require grad
 param_dict = {pn: p for pn, p in param_dict.items() if p.requires_grad}
@@ -426,17 +374,10 @@ fused_available = 'fused' in inspect.signature(torch.optim.AdamW).parameters
 use_fused = fused_available and ('cuda' in device)
 extra_args = dict(fused=True) if use_fused else dict()
 optimizer = torch.optim.AdamW(optim_groups, lr=learning_rate, betas=(beta1, beta2), **extra_args)
-# Loading the optimizer from the last checkpoint
 print(f"using fused AdamW: {use_fused}")
 
 # Set the torch precision to tf32
 torch.set_float32_matmul_precision('high')
-
-
-#============================================
-## Setup for the training loop
-#============================================
-
 
 train_start_time = time.time()
 
@@ -446,19 +387,18 @@ if master_process:
 	log(f'INITIAL LOSS: train loss {last_losses["train"]} | val loss {last_losses["val"]}')
 	best_val_loss = last_losses["val"]
 
-
 print('Current Device:', torch.cuda.current_device())
 
-start_iter = 0
-nb_time_samples = 0
-deltatimes = 0
-tl_max_warmup_iters = 20
-tl_warmup_iters = 0
 
 #============================================
 ## The training loop
 #============================================
 
+start_iter = 0
+nb_time_samples = 0
+deltatimes = 0
+tl_max_warmup_iters = 10
+tl_warmup_iters = 0
 
 for iter in range(start_iter, max_iters):
 
@@ -468,12 +408,25 @@ for iter in range(start_iter, max_iters):
 	# Clear the gradients
 	optimizer.zero_grad(set_to_none=True)
 	
-	xb, yb = get_batch('train')
+	xb, yb, EOI_tokens_indices = train_ims.__next__()
+
+	xb, yb = torch.tensor(data=xb, dtype=torch.int64, device=device), torch.tensor(data=yb, dtype=torch.int64, device=device)
 
 	with torch.autocast(device_type=device, dtype=torch.bfloat16):
-		logits, loss = train_model(xb, yb)
+		logits = train_model(xb)
 	
-	logits, loss = train_model(xb, yb)
+	B, T, C = logits.shape
+	unmasked_logits = []
+	unmasked_targets = []
+
+	for i , EOI_token_index in enumerate(EOI_tokens_indices):
+		unmasked_logits.append(logits[i, EOI_token_index:, :])
+		unmasked_targets.append(yb[i, EOI_token_index:])
+	
+	logits = torch.cat(unmasked_logits, dim=0)
+	targets = torch.cat(unmasked_targets, dim=0)
+
+	loss = F.cross_entropy(logits, targets)
 
 	loss.backward()
 
@@ -488,7 +441,6 @@ for iter in range(start_iter, max_iters):
 	lr = get_lr(iter) if decay_lr else learning_rate
 	for param_group in optimizer.param_groups:
 		param_group['lr'] = lr
-	
 	optimizer.step()
 
 	if cuda_sync:
@@ -500,24 +452,24 @@ for iter in range(start_iter, max_iters):
 		
 		if tl_warmup_iters <= tl_max_warmup_iters:
 			log(f"INIT ITER TIME: {present-past}")
-			log(f"|BATCH_LOSS: {micro_loss:.5f} | TPS: {int(batch_size*block_size/(present-past)):8} tokens/sec. | ITERS: {iter+1} / {max_iters} | EPOCHS: {(block_size * batch_size * (iter+1))/len(train_data):.2f} | COMP: {(iter+1)/max_iters * 100:.2f}% | LR: {lr:.4f} | SPD: {(present - past) * 1000 :.4f} ms/it.| ERT: {convert_seconds((max_iters-iter-1) * (present-past))} | ET: {convert_seconds(present-train_start_time)}", p_level = 1)
-			print(f"|BATCH_LOSS: {micro_loss:.5f}|TPS: {int(batch_size*block_size/(present-past)):8} tokens/sec.|ITERS: {iter+1} / {max_iters}|EPOCHS: {(block_size * batch_size * (iter+1))/len(train_data):.2f}|COMP: {(iter+1)/max_iters * 100:.2f}%|LR: {lr:.4f} it./s|SPD: {(present - past) * 1000 :.4f} ms/it|ERT: {convert_seconds((max_iters-iter-1) * (present-past))}|ET: {convert_seconds(present-train_start_time)}")
+			log(f"|BATCH_LOSS: {micro_loss:.5f} | TPS: {int(batch_size*block_size/(present-past)):8} tokens/sec. | ITERS: {iter+1} / {max_iters} | EPOCHS: {(iter+1)/epoch_iters:.2f} | COMP: {(iter+1)/max_iters * 100:.2f}% | LR: {lr:.4f} | SPD: {(present - past) * 1000 :.4f} ms/it.| ERT: {convert_seconds((max_iters-iter-1) * (present-past))} | ET: {convert_seconds(present-train_start_time)}", p_level = 1)
+			print(f"|BATCH_LOSS: {micro_loss:.5f} | TPS: {int(batch_size*block_size/(present-past)):8} tokens/sec. | ITERS: {iter+1} / {max_iters} | EPOCHS: {(iter+1)/epoch_iters:.2f} | COMP: {(iter+1)/max_iters * 100:.2f}% | LR: {lr:.4f} | SPD: {(present - past) * 1000 :.4f} ms/it.| ERT: {convert_seconds((max_iters-iter-1) * (present-past))} | ET: {convert_seconds(present-train_start_time)}")
 			tl_warmup_iters += 1
 		else:
 			deltatimes += present-past
 			nb_time_samples += 1
 			mean_deltatime = deltatimes / nb_time_samples # mean deltatime
-			log(f"|BATCH_LOSS: {micro_loss:.5f} | TPS: {int(batch_size*block_size/(present-past)):8} tokens/sec. | ITERS: {iter+1} / {max_iters} | EPOCHS: {(block_size * batch_size * (iter+1))/len(train_data):.2f} | COMP: {(iter+1)/max_iters * 100:.2f}% | LR: {lr:.4f} it./s | SPD: {(present - past) * 1000 :.4f} ms/it.| ERT: {convert_seconds((max_iters-iter-1) * mean_deltatime)} | ET: {convert_seconds(present-train_start_time)}", p_level = 1)
-			print(f"|BATCH_LOSS: {micro_loss:.5f}|TPS: {int(batch_size*block_size/(present-past)):8} tokens/sec.|ITERS: {iter+1} / {max_iters}|EPOCHS: {(block_size * batch_size * (iter+1))/len(train_data):.2f}|COMP: {(iter+1)/max_iters * 100:.2f}%|LR: {lr:.4f} it./s|SPD: {(present - past) * 1000 :.4f} ms/it|ERT: {convert_seconds((max_iters-iter-1) * mean_deltatime)}|ET: {convert_seconds(present-train_start_time)}")
+			log(f"|BATCH_LOSS: {micro_loss:.5f} | TPS: {int(batch_size*block_size/(present-past)):8} tokens/sec. | ITERS: {iter+1} / {max_iters} | EPOCHS: {(iter+1)/epoch_iters:.2f} | COMP: {(iter+1)/max_iters * 100:.2f}% | LR: {lr:.4f} it./s | SPD: {(present - past) * 1000 :.4f} ms/it.| ERT: {convert_seconds((max_iters-iter-1) * mean_deltatime)} | ET: {convert_seconds(present-train_start_time)}", p_level = 1)
+			print(f"|BATCH_LOSS: {micro_loss:.5f}|TPS: {int(batch_size*block_size/(present-past)):8} tokens/sec.|ITERS: {iter+1} / {max_iters}|EPOCHS: {(iter+1)/epoch_iters:.2f}|COMP: {(iter+1)/max_iters * 100:.2f}%|LR: {lr:.4f} it./s|SPD: {(present - past) * 1000 :.4f} ms/it|ERT: {convert_seconds((max_iters-iter-1) * mean_deltatime)}|ET: {convert_seconds(present-train_start_time)}")
 		
 		batch_log.write(f"BATCH_LOSS: {micro_loss:.5f}\n")
 		batch_log.flush()
 	
 	# If we reach the evaluation interval, evaluate the model on train.bin and val.bin and checkpoint it
-	if ((iter+1) % eval_interval == 0 or (iter+1) == max_iters) and master_process:
+	if master_process and ((iter+1) % eval_interval == 0 or (iter == max_iters - 1)):
 		
 		log("\nEvaluation and checkpointing ...\n")
-		epoch = (block_size * batch_size * (iter+1))/len(train_data)
+		epoch = (iter+1)/epoch_iters
 		
 		torch.save(model.state_dict(), f"checkpoints/checkpoint_{epoch:.2f}.pth")
 		torch.save(optimizer.state_dict(), f"checkpoints/optimizer_{epoch:.2f}.pth")
@@ -526,7 +478,6 @@ for iter in range(start_iter, max_iters):
 
 		date_hour = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
 		log(f'\ncheckpoint_{date_hour} : iter {iter+1:10d} | epoch {epoch:.2f} | train loss {losses["train"]:.10f} | val loss {losses["val"]:.10f}\n')
-		
 		
 		# Save the last checkpoint
 		with open(f"checkpoints/checkpoint_{epoch:.2f}.info", "w") as f:
