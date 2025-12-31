@@ -17,7 +17,7 @@ from 	InputMaskingSampler import InputMaskingSampler
 #============================================
 
 # Set the device ids
-deviceids = [0, 1, 2, 3] # Set the device ids to use for training
+deviceids = [0, 1] # Set the device ids to use for training
 
 # Check if this is a ddp run
 ddp = int(os.environ.get('RANK', -1)) != -1
@@ -111,8 +111,8 @@ n_embd 		= 256	# Embedding dimension
 n_head 		= 16	# Number of attention heads
 n_layer 	= 12	# Number of transformer blocks
 # Set the data directory
-BASE_MODEL_PATH = "../archive/a3-reaper-abyss/e20-reaper-mechtogan/checkpoints/best-model.pth"
-DDIR = "../../data/d15-majin-extend/"
+BASE_MODEL_PATH = "../archive/a3-reaper-abyss/e23-reaper-equinox/checkpoints/best-model.pth"
+DDIR = "../../data/d18-aquos-extend/"
 with open(DDIR+"vocab_size.txt", "rb") as f:
 	vocab_size = int(f.read())
 if master_process: log(f"vocab_size: {vocab_size}")

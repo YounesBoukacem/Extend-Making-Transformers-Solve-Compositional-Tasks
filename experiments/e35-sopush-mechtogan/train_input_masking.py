@@ -11,6 +11,9 @@ import 	numpy 				as np
 import 	torch.distributed 	as dist
 from 	torch.nn.parallel 	import DistributedDataParallel as DDP
 from 	InputMaskingSampler import InputMaskingSampler
+from 	tokenizer import TinypyTokenizer
+
+tpt = TinypyTokenizer()
 
 #============================================
 ## Setup for multi-GPU training
@@ -111,7 +114,6 @@ n_embd 		= 256	# Embedding dimension
 n_head 		= 16	# Number of attention heads
 n_layer 	= 12	# Number of transformer blocks
 # Set the data directory
-BASE_MODEL_PATH = "../archive/a3-reaper-abyss/e20-reaper-mechtogan/checkpoints/best-model.pth"
 DDIR = "../../data/d15-majin-extend/"
 with open(DDIR+"vocab_size.txt", "rb") as f:
 	vocab_size = int(f.read())
@@ -174,7 +176,7 @@ def estimate_loss():
 			X, Y, EOI_tokens_indices = ims.__next__()
 			X, Y = torch.tensor(data=X, dtype=torch.int64, device=device), torch.tensor(data=Y, dtype=torch.int64, device=device)
 			with torch.autocast(device_type=device, dtype=torch.bfloat16):
-				logits = model(X)
+				logits = model(X, Y, EOI_tokens_indices)
 			B, T, C = logits.shape
 			unmasked_logits = []
 			unmasked_targets = []
@@ -227,36 +229,25 @@ def get_lr(it):
 
 # __Define the model__
 
-pos_embeds_indices = torch.arange(0, block_size, 1, dtype=torch.int64, device=device)
-causal_mask = torch.tril(torch.ones((block_size, block_size), dtype=torch.bool, device=device)) == False
-
 class Head(nn.Module):
 	"""One head of self-attention."""
 
 	def __init__(self, head_size):
 		super().__init__()
-		self.head_size = head_size
 		self.key = nn.Linear(n_embd, head_size, bias=False)
 		self.query = nn.Linear(n_embd, head_size, bias=False)
 		self.value = nn.Linear(n_embd, head_size, bias=False)
-		self.pos_embeds = nn.Embedding(block_size, head_size)
-		self.attn_dropout = nn.Dropout(dropout)
+		self.flash = hasattr(torch.nn.functional, 'scaled_dot_product_attention')
+
+		self.dropout = nn.Dropout(dropout)
 
 	def forward(self, x):
 		B,T,C = x.shape
-		k = self.key(x)   # (B, T, C)
-		q = self.query(x) # (B, T, C)
-		v = self.value(x) # (B, T, C)
-		r = self.pos_embeds(pos_embeds_indices[-T:]) # (T, C)
-		s_rel = q @ r.t() # (B, T, T)
-		s_rel = F.pad(s_rel, (1,0)) # (B, T, 1+T)
-		s_rel = s_rel.reshape(B, s_rel.shape[-1], s_rel.shape[-2]) # (B, 1+T, T)
-		s_rel = s_rel[:, 1:, :] # (B, T, T)
-		attn = ((q @ k.transpose(-2, -1)) + s_rel) * (self.head_size ** -0.5) # (B, T, T)
-		attn = attn.masked_fill(causal_mask[:T,:T], float('-inf')) # (B, T, T)
-		attn = F.softmax(attn, dim=-1) # (B, T, T)
-		attn = self.attn_dropout(attn) # (B, T, T)
-		out = attn @ v # (B, T, C)
+		k = self.key(x)   # (B, T, 16)
+		q = self.query(x) # (B, T, 16)
+		v = self.value(x)
+		
+		out = torch.nn.functional.scaled_dot_product_attention(q, k, v, attn_mask=None, dropout_p=dropout if self.training else 0, is_causal=True)
 		
 		return out
 
@@ -311,26 +302,27 @@ class GPT(nn.Module):
 		super().__init__()
 		# each token directly reads off the logits for the next token from a lookup table
 		self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
+		self.position_embedding_table = nn.Embedding(block_size, n_embd)
 		self.blocks = nn.Sequential(*[Block(n_embd, n_head=n_head) for _ in range(n_layer)])
 		self.ln_f = nn.LayerNorm(n_embd, bias=False)
 		self.lm_head = nn.Linear(n_embd, vocab_size)
 
-
-	def forward(self, idx):
+	def forward(self, idx, targets=None, EOI_tokens_indices=None):
 		B, T = idx.shape
 
 		# idx and targets are both (B,T) tensor of integers
-		x = self.token_embedding_table(idx) # (B,T,C)
+		tok_emb = self.token_embedding_table(idx) # (B,T,C)
+		pos_emb = self.position_embedding_table(torch.arange(T, device=device)) # (T,C)
+		x = tok_emb + pos_emb # (B,T,C)
 		x = self.blocks(x) # (B,T,C)
 		x = self.ln_f(x) # (B,T,C)
 		logits = self.lm_head(x) # (B,T,vocab_size)
 
 		return logits
 
-
 # Create the model
 model = GPT()
-model.load_state_dict(torch.load(BASE_MODEL_PATH, map_location=device))
+model.load_state_dict(torch.load("../archive/a2-push-nova/e16-push-mechtogan/checkpoints/best-model.pth", map_location=device))
 # Loading the model from the last checkpoint
 model.to(device)
 num_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -411,7 +403,7 @@ for iter in range(start_iter, max_iters):
 	xb, yb = torch.tensor(data=xb, dtype=torch.int64, device=device), torch.tensor(data=yb, dtype=torch.int64, device=device)
 
 	with torch.autocast(device_type=device, dtype=torch.bfloat16):
-		logits = train_model(xb)
+		logits = train_model(xb, yb, EOI_tokens_indices)
 	
 	B, T, C = logits.shape
 	unmasked_logits = []
