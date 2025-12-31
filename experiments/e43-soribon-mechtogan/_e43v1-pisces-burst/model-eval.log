@@ -1,4 +1,4 @@
-|ITERS: 10000 / 10000 | COMP: 100.00% | RATE: 365.28 ex./s | SPD: 2.7377 s/it.| ERT: (0, 0, 0, 0) | ET: (0, 0, 0, 45)                                                                                   
+|ITERS: 10000 / 10000 | COMP: 100.00% | RATE: 433.11 ex./s | SPD: 2.3089 s/it.| ERT: (0, 0, 0, 0) | ET: (0, 0, 0, 38)                                                                                   
 |hard-accuracy: 10000 = 100.00% | soft-accuracy: 0 = 0.00% |                                                                                                                                            
 
 Imports:

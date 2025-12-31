@@ -15,7 +15,7 @@ test_sets = [
 	"ood_nb_inputs_str_length_all.txt"	
 ]
 
-deviceid = 4
+deviceid = 0
 for i, test_set in enumerate(test_sets):
 	
 	# Create the eval subfolder

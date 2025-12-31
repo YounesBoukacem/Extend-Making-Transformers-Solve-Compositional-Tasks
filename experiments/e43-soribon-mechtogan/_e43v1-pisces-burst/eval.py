@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 DDIR  = "../../../data/d7-push-majin/" # Data directory
 model_path = "../checkpoints/best-model.pth" # Path to the model
-deviceid = 2
+deviceid = 0
 amp = False
 
 
@@ -83,7 +83,14 @@ n_layer = 12    # Number of transformer blocks
 dropout = 0	   # Dropout rate
 batch_size = 64   # Batch size for training
 
-pos_embeds_indices = torch.arange(0, block_size, 1, dtype=torch.int64, device=device)
+pos_embeds_indices = []
+for i in range(block_size):
+	line = []
+	for j in range(block_size):
+		line.append(max(i-j, 0))
+	pos_embeds_indices.append(line)
+pos_embeds_indices = torch.tensor(pos_embeds_indices, dtype=torch.int64, device=device) # (block_size, block_size)
+
 causal_mask = torch.tril(torch.ones((block_size, block_size), dtype=torch.bool, device=device)) == False
 
 class Head(nn.Module):
@@ -95,7 +102,7 @@ class Head(nn.Module):
 		self.key = nn.Linear(n_embd, head_size, bias=False)
 		self.query = nn.Linear(n_embd, head_size, bias=False)
 		self.value = nn.Linear(n_embd, head_size, bias=False)
-		self.pos_embeds = nn.Embedding(block_size, head_size)
+		self.pos_embeds = nn.Embedding(block_size, 1)
 		self.attn_dropout = nn.Dropout(dropout)
 
 	def forward(self, x):
@@ -103,13 +110,9 @@ class Head(nn.Module):
 		k = self.key(x)   # (B, T, C)
 		q = self.query(x) # (B, T, C)
 		v = self.value(x) # (B, T, C)
-		r = self.pos_embeds(pos_embeds_indices[-T:]) # (T, C)
-		s_rel = q @ r.t() # (B, T, T)
-		s_rel = F.pad(s_rel, (1,0)) # (B, T, 1+T)
-		s_rel = s_rel.reshape(B, s_rel.shape[-1], s_rel.shape[-2]) # (B, 1+T, T)
-		s_rel = s_rel[:, 1:, :] # (B, T, T)
-		attn = ((q @ k.transpose(-2, -1)) + s_rel) * (self.head_size ** -0.5) # (B, T, T)
-		attn = attn.masked_fill(causal_mask[:T,:T], float('-inf')) # (B, T, T)
+		pos_bias_matrix = self.pos_embeds(pos_embeds_indices[:T]).squeeze() # (T, T)
+		attn = ((q @ k.transpose(-2, -1)) + pos_bias_matrix) * (self.head_size ** -0.5) # (B, T, T)
+		attn = attn.masked_fill(causal_mask[:T, :T], float('-inf')) # (B, T, T)
 		attn = F.softmax(attn, dim=-1) # (B, T, T)
 		attn = self.attn_dropout(attn) # (B, T, T)
 		out = attn @ v # (B, T, C)
@@ -146,7 +149,7 @@ class FeedForward(nn.Module):
 		return self.net(x)
 	
 class Block(nn.Module):
-	""" Transformer block: communication followed by feedforward."""
+	"""Transformer block: communication followed by feedforward."""
 
 	def __init__(self, n_embd, n_head):
 		super().__init__()
@@ -171,7 +174,7 @@ class GPT(nn.Module):
 		self.ln_f = nn.LayerNorm(n_embd, bias=False)
 		self.lm_head = nn.Linear(n_embd, vocab_size)
 
-	def forward(self, idx, targets=None):
+	def forward(self, idx):
 		B, T = idx.shape
 
 		# idx and targets are both (B,T) tensor of integers
@@ -180,15 +183,7 @@ class GPT(nn.Module):
 		x = self.ln_f(x) # (B,T,C)
 		logits = self.lm_head(x) # (B,T,vocab_size)
 
-		if targets is None:
-			loss = None
-		else:
-			B, T, C = logits.shape
-			logits = logits.view(B*T, C)
-			targets = targets.view(B*T)
-			loss = F.cross_entropy(logits, targets)
-
-		return logits, loss
+		return logits
 	
 @torch.no_grad()
 def generate(model, compiled_model, idx, prompt_lengths, max_new_tokens):
@@ -199,7 +194,7 @@ def generate(model, compiled_model, idx, prompt_lengths, max_new_tokens):
 		# get the predictions
 		with ctx:
 			loc_tens = torch.ones((batch_size, block_size), dtype=torch.long, device=device).copy_(idx_cond)
-			logits, loss = compiled_model(loc_tens)
+			logits = compiled_model(loc_tens)
 
 		# focus only on the last time step
 		# logits = logits[:, -1, :] # becomes (B, C)
