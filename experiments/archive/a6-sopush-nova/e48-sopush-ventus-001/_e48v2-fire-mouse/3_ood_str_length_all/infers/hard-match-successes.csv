@@ -1,0 +1,25 @@
+,example_input,example_output,all-generated-output
+0,"#input
+drjvvp
+bsuxen
+yiqyut
+#output
+","p v v j r d 
+ n e x u s b 
+ t u y q i y","p v v j r d 
+ n e x u s b 
+ t u y q i y@"
+1,"#input
+pskppf
+bsjwvg
+#output
+","f p p k s p 
+ g v w j s b","f p p k s p 
+ g v w j s b@"
+2,"#input
+qdbffc
+jfaezb
+#output
+","c f f b d q 
+ b z e a f j","c f f b d q 
+ b z e a f j@"
