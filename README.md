@@ -22,6 +22,8 @@ Each experiment archive contains 4 `experiments` subfolders:
 
 **N.B:** the names of the data, archive and experiments folders were randomly generated unique IDs (this is why they don't really make sense 😅).
 
+**N.B:** the model checkpoints and datasets weren't loaded to this repository as they are too heavy, but we ensured that they are completely reproducible by fixing the random seeds in the script 😄.
+
 # The presentation part
 
 The 📁 `presentation` contains the required:
